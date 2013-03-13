@@ -128,3 +128,24 @@ The `id` parameter is captured in the lambda's closure, so there's no need
 to find a place to store it, which would be messy and non-thread-safe.
 
 
+### Object lifetimes
+
+Because the operations are asynchronous and your callbacks are invoked
+"whenever", you have to take care that anything your callbacks do will still
+be safe to do at the time they are called.
+
+For example, if your callback modifies a widget to reflect the response from
+the server, you need to be sure that the widget still exists before doing
+anything to it.
+
+Sometimes checking for safety is difficult. In those cases you can take
+advantage of this useful fact: when a `hurl::async_client` instance is
+destroyed, all of its outstanding callbacks will be canceled. (The threads
+running the requests will still run to completion, but they will not attempt
+to invoke callbacks associated with  destroyed client.)
+
+Thus, one pattern you might employ is a widget that has its own `async_client`
+as a member variable; the widget can freely make requests on the client using
+callbacks that will operate on itself with complete safety: if the widget is
+ever destroyed, its client will be destroyed as well, canceling the callbacks.
+
