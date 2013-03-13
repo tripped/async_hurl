@@ -1,0 +1,3 @@
+[submodule "hurl"]
+	path = hurl
+	url = git://github.com/mraccident/hurl.git
